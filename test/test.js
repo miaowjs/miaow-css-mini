@@ -42,6 +42,6 @@ describe('miaow-css-mini', function () {
   });
 
   it('压缩', function () {
-    assert(log.modules['foo.css'].hash, 'd6f0ca6a8ee425b1539b08c8ac031949');
+    assert.equal(log.modules['foo.css'].hash, 'd6f0ca6a8ee425b1539b08c8ac031949');
   });
 });
