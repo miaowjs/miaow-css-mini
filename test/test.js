@@ -1,5 +1,5 @@
 var assert = require('assert');
-var fs = require('fs');
+var fs = require('fs-extra');
 var miaow = require('miaow');
 var path = require('path');
 
@@ -9,10 +9,13 @@ describe('miaow-css-mini', function () {
 
   var log;
 
-  before(function (done) {
+  var cwd = path.resolve(__dirname, './fixtures');
+  var output = path.resolve(__dirname, './output');
+
+  function doCompile(cb) {
     miaow.compile({
-      cwd: path.resolve(__dirname, './fixtures'),
-      output: path.resolve(__dirname, './output'),
+      cwd: cwd,
+      output: output,
       pack: false,
       module: {
         tasks: [
@@ -32,9 +35,15 @@ describe('miaow-css-mini', function () {
         console.error(err.toString());
         throw err;
       }
-      log = JSON.parse(fs.readFileSync(path.resolve(__dirname, './output/miaow.log.json')));
-      done();
+
+      log = JSON.parse(fs.readFileSync(path.join(output, 'miaow.log.json')));
+      cb();
     });
+  }
+
+  before(function (done) {
+    fs.emptyDirSync(output);
+    doCompile(done);
   });
 
   it('接口是否存在', function () {
@@ -42,6 +51,17 @@ describe('miaow-css-mini', function () {
   });
 
   it('压缩', function () {
-    assert.equal(log.modules['foo.css'].hash, 'd6f0ca6a8ee425b1539b08c8ac031949');
+    console.log(log.modules);
+    assert.equal(log.modules['foo.css'].hash, '034cfd8f122bc6d61b9b8376e1e55cd1');
+  });
+
+  it('缓存', function (done) {
+    var fooPath = path.join(output, 'foo.css');
+    fs.writeFileSync(fooPath, '/* load cache */');
+
+    doCompile(function () {
+      assert.equal(fs.readFileSync(fooPath, {encoding: 'utf8'}), '/* load cache */');
+      done();
+    });
   });
 });
