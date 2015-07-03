@@ -51,8 +51,8 @@ describe('miaow-css-mini', function () {
   });
 
   it('压缩', function () {
-    console.log(log.modules);
-    assert.equal(log.modules['foo.css'].hash, '034cfd8f122bc6d61b9b8376e1e55cd1');
+    var stat = fs.statSync(path.join(output, 'foo.css'));
+    assert.equal(stat.size, 56);
   });
 
   it('缓存', function (done) {
