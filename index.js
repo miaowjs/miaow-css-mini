@@ -1,4 +1,7 @@
 var CleanCSS = require('clean-css');
+var mutil = require('miaow-util');
+
+var pkg = require('./package.json');
 
 function minify(option, cb) {
   // 如果有缓存就用缓存内容
@@ -14,4 +17,4 @@ function minify(option, cb) {
   cb();
 }
 
-module.exports = minify;
+module.exports = mutil.plugin(pkg.name, pkg.version, minify);
