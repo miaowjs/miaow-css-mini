@@ -1,7 +1,7 @@
 {
   "name": "miaow-css-mini",
   "description": "Miaow的CSS压缩工具",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": "miaowjs/miaow-css-mini",
   "author": {
     "name": "anhulife",
