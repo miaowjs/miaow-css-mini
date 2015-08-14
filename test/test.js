@@ -11,12 +11,15 @@ describe('miaow-css-mini', function () {
 
   var cwd = path.resolve(__dirname, './fixtures');
   var output = path.resolve(__dirname, './output');
+  var cache = path.resolve(__dirname, './cache');
+
+  fs.removeSync(cache);
 
   function doCompile(cb) {
     miaow.compile({
       cwd: cwd,
       output: output,
-      pack: false,
+      cache: cache,
       module: {
         tasks: [
           {
@@ -56,11 +59,12 @@ describe('miaow-css-mini', function () {
   });
 
   it('缓存', function (done) {
-    var fooPath = path.join(output, 'foo.css');
-    fs.writeFileSync(fooPath, '/* load cache */');
+    var cacheInfo = JSON.parse(fs.readFileSync(path.join(cache, 'miaow.cache.json')));
+    var filePath = path.join(cache, cacheInfo['foo.css'][0].file);
+    fs.writeFileSync(filePath, '/* load cache */');
 
     doCompile(function () {
-      assert.equal(fs.readFileSync(fooPath, {encoding: 'utf8'}), '/* load cache */');
+      assert.equal(fs.readFileSync(filePath, {encoding: 'utf8'}), '/* load cache */');
       done();
     });
   });
