@@ -1,28 +1,26 @@
 var CleanCSS = require('clean-css');
-var mutil = require('miaow-util');
 
 var pkg = require('./package.json');
 
-var minify = mutil.plugin(pkg.name, pkg.version, function (option, cb) {
-  var contents = this.contents.toString();
+module.exports = function(options, callback) {
+  var context = this;
+  var contents = context.contents.toString();
+
   if (!contents.trim()) {
-    return cb();
+    return callback();
   }
 
-  // 如果有缓存就用缓存内容
-  var hash = mutil.hash(contents);
-  var cachedContents = this.getCache(minify.toString(), hash);
-  if (cachedContents) {
-    this.contents = cachedContents;
-    return cb();
+  try {
+    context.contents = new Buffer(
+      new CleanCSS(options).minify(contents).styles
+    );
+  } catch (err) {
+    return callback(err);
   }
 
-  this.contents = new Buffer(
-    new CleanCSS(option).minify(contents).styles
-  );
-  // 缓存压缩结果
-  this.addCache(minify.toString(), hash, this.contents);
-  cb();
-});
+  callback();
+};
 
-module.exports = minify;
+module.exports.toString = function() {
+  return [pkg.name, pkg.version].join('@');
+};
